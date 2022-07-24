@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dentarea</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@3.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_pack_tag 'application'%>
+    <%= javascript_pack_tag 'application' %>
+  </head>
+
+  <body>
+    <div id="app">
+      <v-app>
+
+        <%# ヘッダー %>
+        <v-app-bar
+          fixed
+          dense
+          color="white"
+          elevate-on-scroll
+        >
+
+          <%= link_to "Dantarea", root_path %>
+          <div>/</div>
+          <%= link_to "hospitals", hospitals_path %>
+
+          <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
+
+          <v-text-field
+            hide-details
+            prepend-icon="mdi-magnify"
+            single-line
+          ></v-text-field>
+
+          <% if logged_in? %>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+          <% else %>
+            <%= link_to "Googleでログイン", "/auth/google_oauth2", method: :post %>
+          <% end %>
+
+        </v-app-bar>
+
+        <%# ナビゲーションドロワー %>
+        <v-navigation-drawer
+          absolute
+          v-model="drawer"
+          top
+          right
+          temporary
+        >
+          <v-list
+            nav
+            dense
+          >
+            <v-list-item-group
+              v-model="group"
+            >
+              <v-list-item>
+                <v-list-item-title>Foo</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item>
+                <v-list-item-title>Bar</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item>
+                <v-list-item-title>Fizz</v-list-item-title>
+              </v-list-item>
+
+              <v-list-item>
+                <v-list-item-title>
+                  <%= link_to "ログアウト", logout_path, method: :delete %>
+                </v-list-item-title>
+              </v-list-item>
+
+            </v-list-item-group>
+          </v-list>
+        </v-navigation-drawer>
+
+
+        <v-card
+          class="pa-2 ma-2 mx-lg-auto"
+          color="primary"
+        ></v-card>
+
+        <v-card
+          class="pa-8 ma-8 mx-lg-auto"
+          color="primary"
+        >
+          <v-card-text class="pa-8 ma-8 mx-lg-auto">
+            <div>
+              <p>検索</p>
+              <%= form_tag(hospitals_path,:method => 'get') do %>
+                <%= text_field_tag :search %>
+                <%= submit_tag 'Search', :name => nil %>
+              <% end %>
+            </div>
+            <%= yield %>
+          </v-card-text>
+        </v-card>
+
+
+      </v-app>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        data: () => ({
+          drawer: false,
+          group: null,
+        }),
+
+        watch: {
+          group () {
+            this.drawer = false
+          },
+        },
+      })
+    </script>
+    <%= stylesheet_pack_tag 'application_vue' %>
+    <%= javascript_pack_tag 'application_vue' %>
+  </body>
+</html>

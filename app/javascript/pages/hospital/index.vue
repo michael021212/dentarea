@@ -1,0 +1,91 @@
+<template>
+  <v-app>
+    <div v-if="errors.length != 0">
+      <ul v-for="e in errors" :key="e">
+        <li><font color="red">{{ e }}</font></li>
+      </ul>
+    </div>
+
+    <table>
+      <tbody>
+        <tr>
+          <th>ID</th>
+          <th>name</th>
+          <th>email</th>
+          <th>actions</th>
+        </tr>
+        <tr v-for="e in employees" :key="e.id">
+          <td>詳細</td>
+          <td>{{ e.name }}</td>
+          <td>{{ e.email }}</td>
+          <td>編集{{userId}}</td>
+          <td>
+            <button @click="deleteTarget = e.id; showModal = true">削除</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <modal v-if="showModal" @cancel="showModal = false" @ok="deleteEmployee(); showModal = false;">
+      <div slot="body">Are you sure?</div>
+    </modal>
+  </v-app>
+</template>
+
+<script>
+import axios from 'axios';
+import Modal from '@/components/Modal'
+
+export default {
+  components: {
+    Modal
+  },
+  data: function () {
+    return {
+      employees: [],
+      showModal: false,
+      deleteTarget: -1,
+      errors: '',
+      userId: ""
+    }
+  },
+  mounted () {
+    this.updateEmployees();
+  },
+  methods: {
+    deleteEmployee: function() {
+      if (this.deleteTarget <= 0) {
+        console.warn('deleteTarget should be grater than zero.');
+        return;
+      }
+
+      axios
+        .delete(`/api/v1/hospitals/${this.deleteTarget}`)
+        .then(response => {
+          this.deleteTarget = -1;
+          this.updateEmployees();
+        })
+        .catch(error => {
+          console.error(error);
+          if (error.response.data && error.response.data.errors) {
+            this.errors = error.response.data.errors;
+          }
+        });
+    },
+    updateEmployees: function() {
+      axios
+        .get('/api/v1/hospitals.json')
+        .then(response => (this.employees = response.data))
+    }
+  },
+  created() {
+    this.userId = sharedData.user_id;
+  }
+}
+</script>
+
+<style scoped>
+p {
+  font-size: 2em;
+  text-align: center;
+}
+</style>
